@@ -1,30 +1,12 @@
-# 2012/04/01 森くん作の新コンパイルWS向けbashrcファイル
-# Copyright Akihiro.Kakoi<akihiro.kakoi@nts.ricoh.co.jp>
+#!/bin/bash
+# authenticated proxy server util.
+# author: Akihiro.Kakoi<akihiro.kakoi@gmail.com>
 
-# Source global definitions
-if [ -f /etc/bashrc ]; then
-	. /etc/bashrc
-fi
 
-# User specific aliases and functions
-alias ll='ls -lF'
-alias la='ls -aF'
-alias lla='ls -aFl'
-alias rm='rm -i'
-
-#for X
-USER=`whoami`
-export DISPLAY=`last -n 1 $USER|grep kakoi|awk '{print $3}'`:0.0
-
-#for python
-#export PYTHONPATH=~/usr/lib/python2.6/site-packages
-#export PATH=~/usr/bin:${PATH}
-
-#パスワードをシェルスクリプトに書くのが嫌なので
-#シェル関数経由で設定するように変更
-proxy_adrs='proxy.ricoh.co.jp'
+proxy_adrs='proxy.server.address'
 proxy_port='8080'
-export no_proxy="localhost,127.0.0.0/8,*.ricoh.co.jp,10.60.99.0/8"
+deny_proxy="localhost,127.0.0.0/8,*"
+
 function setproxy
 {
     user=$1
@@ -37,6 +19,7 @@ function setproxy
     export HTTP_PROXY=$proxy
     export HTTPS_PROXY=$proxy
     export FTP_PROXY=$proxy
+    export no_proxy=$deny_proxy
 }
 
 #環境変数勝手に見ていつもプロキシーにつなぎに行く
@@ -52,14 +35,15 @@ function unsetproxy
     export -n HTTP_PROXY
     export -n HTTPS_PROXY
     export -n FTP_PROXY
+    export -n no_proxy
 }
 
 
-#ID パスワード入力　ダイアログを出して入力させる。
+#proxy id & pass input dialog
 function suid_input_diag
 {
-    echo -n "Login SingleUserID"
-    echo 
+    echo -n "proxy server login"
+    echo
     echo -n "userid>"
     read INPUT
     echo -n "passwd>"
@@ -70,11 +54,3 @@ function suid_input_diag
     setproxy $INPUT $PASSWD
 }
 
-
-# for ARM Cross Env
-export PATH=${PATH}:/opt/arm-2011.03/bin
-
-
-# start up
-#~/bin/redminenews.py
-# suid_input_diag
